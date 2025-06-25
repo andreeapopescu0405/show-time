@@ -1,0 +1,19 @@
+﻿@page "/images"
+@rendermode InteractiveServer
+
+
+
+<Carousel @bind-SelectedSlide="@selectedSlide">
+    <CarouselSlide Name="1">
+        <Image Source="https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?cs=srgb&dl=pexels-sebastian-ervi-866902-1763075.jpg&fm=jpg" Text="Lights image" Display="Display.Block" Width="Width.Is100" />
+    </CarouselSlide>
+    <CarouselSlide Name="2">
+        <Image Source="https://images.unsplash.com/photo-1506157786151-b8491531f063?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWMlMjBmZXN0aXZhbHxlbnwwfHwwfHx8MA%3D%3D" Text="Keyboard image" Display="Display.Block" Width="Width.Is100" />
+    </CarouselSlide>
+    <CarouselSlide Name="3">
+        <Image Source="https://www.ventoinsurance.com/wp-content/uploads/2024/11/festival3-scaled.jpg" Text="Road image" Display="Display.Block" Width="Width.Is100" />
+    </CarouselSlide>
+</Carousel>
+@code {
+    private string selectedSlide = "2";
+}
