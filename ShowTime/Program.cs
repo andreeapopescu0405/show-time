@@ -1,4 +1,4 @@
-using Blazorise;
+﻿using Blazorise;
 using ShowTime.Components;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
@@ -9,12 +9,12 @@ using ShowTime.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContext<ShowTimeContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString")));
+builder.Services.AddDbContextFactory<ShowTimeContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString")));
 
 builder.Services.AddScoped<IBandRepository, BandRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
@@ -30,7 +30,7 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

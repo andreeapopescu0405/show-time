@@ -1,4 +1,65 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<style>
+    
+    .top-row.navbar {
+        background-color: #4a1e1e; 
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        border-bottom: 3px solid #b33939;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+   
+    .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #f07167; 
+        font-family: 'Poppins', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+    }
+
+    
+    .nav-scrollable {
+        background-color: #5e2b2b; 
+        padding-top: 1rem;
+        border-right: 3px solid #b33939;
+        min-height: 100vh;
+    }
+
+    
+    .nav-item {
+        margin-bottom: 1rem;
+    }
+
+    
+    .nav-link {
+        color: #f07167;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #b33939;
+            color: #fff0f0;
+            text-decoration: none;
+        }
+
+        
+        .nav-link .bi {
+            margin-right: 0.5rem;
+            color: #f07167;
+        }
+
+</style>
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">ShowTime</a>
     </div>
@@ -14,17 +75,28 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
+        @* <div class="nav-item px-3"> *@
+        @*     <NavLink class="nav-link" href="counter"> *@
+        @*         <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter *@
+        @*     </NavLink> *@
+        @* </div> *@
 
+        @* <div class="nav-item px-3"> *@
+        @*     <NavLink class="nav-link" href="weather"> *@
+        @*         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather *@
+        @*     </NavLink> *@
+        @* </div> *@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="bands">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Bands
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="festivals">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Festivals
+            </NavLink>
+        </div>
+       
     </nav>
 </div>
 

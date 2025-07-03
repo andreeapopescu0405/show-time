@@ -1,0 +1,80 @@
+﻿@page "/festivals"
+@using Blazorise.DataGrid;
+@inject IFestivalRepository FestivalRepo;
+
+<h3>Festivals</h3>
+
+<style>
+    h1, h2, h3 {
+        font-family: 'Poppins', sans-serif;
+        color: #6c2c0a;
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: coral;
+        border: none;
+        padding: 0.6rem 1.3rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(242, 100, 25, 0.3);
+        display: inline-block;
+        text-decoration: none;
+        user-select: none;
+    }
+
+        .btn-primary:hover {
+            background-color: brown;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(211, 84, 0, 0.5);
+        }
+
+</style>
+
+<div class="mb-3">
+    <NavLink class="btn btn-primary" href="festivals/create" Match="NavLinkMatch.All">Add New Festival</NavLink>
+</div>
+
+<DataGrid Titem="Festival"
+          Data="@_festivals"
+          ShowPage="true"
+          PageSize="10"
+          Responsive="true"
+          Striped="true"
+          Bordered="true"
+          Hoverable="true">
+
+    <DataGridColumns>
+        <DataGridColumn TItem="Festival" Field="@nameof(Festival.Name)" Caption="Name"></DataGridColumn>
+        <DataGridColumn TItem="Festival" Field="@nameof(Festival.Location)" Caption="Location"></DataGridColumn>
+        <DataGridDateColumn Field="@nameof(Festival.DataStart)" Caption="Start date" Editable NativeInputMode />
+        
+        <DataGridDateColumn Field="@nameof(Festival.DataEnd)" Caption="End date" Editable NativeInputMode />
+        
+        <DataGridColumn TItem="Festival" Caption="Actions">
+            <DisplayTemplate>
+                <a href="@($"festivals/edit/{context.Id}")" style="color: sienna;">Edit</a>
+                <a href="@($"festivals/details/{context.Id}")" style="color: indianred;">Details</a>
+                <a href="@($"festivals/delete/{context.Id}")" style="color: darkred;">Delete</a>
+
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+</DataGrid>
+
+
+@code {
+   
+    private List<Festival> _festivals;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _festivals = (await FestivalRepo.GetAllAsync()).ToList();
+        await base.OnInitializedAsync();
+    }
+}

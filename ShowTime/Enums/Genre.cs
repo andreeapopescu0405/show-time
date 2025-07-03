@@ -1,4 +1,4 @@
-﻿namespace ShowTime.Emuns
+﻿namespace ShowTime.Enums
 {
     public enum Genre
     {

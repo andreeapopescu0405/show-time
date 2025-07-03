@@ -1,0 +1,81 @@
+﻿@page "/bands/delete/{id:guid}"
+@inject IBandRepository BandRepo
+@inject NavigationManager NavigationManager
+
+<style>
+    .delete-card {
+        width: 500px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+    }
+
+    .delete-header {
+        background-color: #dc3545; 
+        color: white;
+        padding: 1rem 1.5rem;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .delete-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .delete-footer {
+        padding: 1rem 1.5rem;
+        background-color: #f9f9f9;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        text-align: right;
+    }
+</style>
+
+<div class="d-flex justify-content-center mt-5">
+    @if (Band == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="delete-card bg-white">
+            <div class="delete-header">
+                <h4 class="mb-0">Confirm Delete</h4>
+            </div>
+            <div class="delete-body">
+                Are you sure you want to permanently delete the band <strong>@Band.Name</strong>?
+            </div>
+            <div class="delete-footer">
+                <Button Color="Color.Danger" Clicked="DeleteBand">Delete</Button>
+                <Button Color="Color.Secondary" Clicked="Cancel" Class="ms-2">Cancel</Button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private Band? Band;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Band = await BandRepo.GetByIdAsync(id);
+        if (Band == null)
+            NavigationManager.NavigateTo("/bands");
+    }
+
+    private async Task DeleteBand()
+    {
+        if (Band != null)
+        {
+            await BandRepo.DeleteAsync(Band); 
+            await BandRepo.SaveChangesAsync();
+            NavigationManager.NavigateTo("/bands");
+        }
+    }
+
+    private void Cancel() => NavigationManager.NavigateTo("/bands");
+}

@@ -46,7 +46,7 @@
             <div class="carousel-slide-overlay">
                 <h2>Intencity Craiova</h2>
                 <p>Music, light, and pure energy. Don’t miss the 2025 edition!</p>
-                <Button Color="Color.Danger" Size="Size.Large" Clicked="@GoToTickets">Buy ticket</Button>
+                <Button Color="Color.Danger" Size="Size.Large" Clicked="@GoToBands">View bands</Button>
             </div>
         </CarouselSlide>
 
@@ -62,7 +62,7 @@
         <div class="carousel-slide-overlay">
             <h2>Untold Festival</h2>
                 <p>Cluj vibrates every summer. Be there!</p>
-            <Button Color="Color.Warning" Size="Size.Large" Clicked="@GoToTickets">Buy ticket</Button>
+                <Button Color="Color.Warning" Size="Size.Large" Clicked="@GoToBands">View bands</Button>
         </div>
     </CarouselSlide>
 
@@ -77,7 +77,7 @@
         <div class="carousel-slide-overlay">
             <h2>Beach Please</h2>
                 <p>The sea, the music, and the summer vibe. Secure your ticket!</p>
-            <Button Color="Color.Info" Size="Size.Large" Clicked="@GoToTickets">Buy ticket</Button>
+                <Button Color="Color.Info" Size="Size.Large" Clicked="@GoToBands">View bands</Button>
         </div>
     </CarouselSlide>
         <CarouselSlide Name="2">
@@ -92,9 +92,9 @@
 
     [Inject] NavigationManager NavigationManager { get; set; }
 
-    private void GoToTickets()
+    private void GoToBands()
     {
-        NavigationManager.NavigateTo("/tickets");
+        NavigationManager.NavigateTo("/bands");
     }
     
 }

@@ -5,7 +5,7 @@ namespace ShowTime.Models
     public class Booking
     {
         [Key]
-        public int Guid { get; set; }
+        public Guid Id { get; set; } 
         public DateTime Date { get; set; }
         [Required]
         public float Price { get; set; }

@@ -1,0 +1,81 @@
+﻿@page "/festivals/delete/{id:guid}"
+@inject IFestivalRepository FestivalRepo
+@inject NavigationManager NavigationManager
+
+<style>
+    .delete-card {
+        width: 500px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+    }
+
+    .delete-header {
+        background-color: #6c2c0a;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .delete-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .delete-footer {
+        padding: 1rem 1.5rem;
+        background-color: #f4f4f4;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        text-align: right;
+    }
+</style>
+
+<div class="d-flex justify-content-center mt-5">
+    @if (Festival == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="delete-card bg-white">
+            <div class="delete-header">
+                <h4 class="mb-0">Delete Festival</h4>
+            </div>
+            <div class="delete-body">
+                Are you sure you want to delete the festival <strong>@Festival.Name</strong> located in <strong>@Festival.Location</strong>?
+            </div>
+            <div class="delete-footer">
+                <Button Color="Color.Danger" Clicked="DeleteFestival">Delete</Button>
+                <Button Color="Color.Secondary" Clicked="Cancel" Class="ms-2">Cancel</Button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private Festival? Festival;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Festival = await FestivalRepo.GetByIdAsync(id);
+        if (Festival == null)
+            NavigationManager.NavigateTo("/festivals");
+    }
+
+    private async Task DeleteFestival()
+    {
+        if (Festival != null)
+        {
+           await  FestivalRepo.DeleteAsync(Festival);
+            await FestivalRepo.SaveChangesAsync();
+            NavigationManager.NavigateTo("/festivals");
+        }
+    }
+
+    private void Cancel() => NavigationManager.NavigateTo("/festivals");
+}

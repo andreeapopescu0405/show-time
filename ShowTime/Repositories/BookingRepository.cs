@@ -8,6 +8,6 @@ namespace ShowTime.Repositories
     {
         public BookingRepository(ShowTimeContext context) : base(context) { }
     }
-    {
-    }
+    
+    
 }

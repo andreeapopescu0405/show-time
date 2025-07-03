@@ -1,0 +1,80 @@
+﻿@page "/festivals/details/{id:guid}"
+@inject IFestivalRepository FestivalRepo
+@inject NavigationManager NavigationManager
+
+<style>
+    .festival-card {
+        width: 600px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+    }
+
+    .festival-header {
+        background-color: burlywood;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .festival-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .festival-footer {
+        padding: 1rem 1.5rem;
+        background-color: #f0f0f0;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        text-align: right;
+    }
+
+    .festival-label {
+        font-weight: bold;
+        color: #f46c24;
+    }
+
+    .festival-value {
+        color: #333;
+    }
+</style>
+
+<div class="d-flex justify-content-center mt-5">
+    @if (Festival == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="festival-card bg-white">
+            <div class="festival-header">
+                <h4 class="mb-0">@Festival.Name</h4>
+            </div>
+            <div class="festival-body">
+                <p><span class="festival-label">Location:</span> <span class="festival-value">@Festival.Location</span></p>
+                <p><span class="festival-label">Start Date:</span> <span class="festival-value">@Festival.DataStart.ToString("dd MMM yyyy")</span></p>
+                <p><span class="festival-label">End Date:</span> <span class="festival-value">@Festival.DataEnd.ToString("dd MMM yyyy")</span></p>
+            </div>
+            <div class="festival-footer">
+                <Button Color="Color.Secondary" Clicked="GoBack">Back to List</Button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private Festival? Festival;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Festival = await FestivalRepo.GetByIdAsync(id);
+        if (Festival == null)
+            NavigationManager.NavigateTo("/festivals");
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/festivals");
+}

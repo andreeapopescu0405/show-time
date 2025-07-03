@@ -18,14 +18,12 @@ namespace ShowTime.Repositories
             await _context.AddAsync(entity);
         }
 
-        public void Delete(T entity)
-        {
-            _dbSet.Remove(entity);
-        }
+       
         public async Task<T?> GetByIdAsync(Guid Id)
         {
-            return await _dbSet.FindAsync();
+            return await _dbSet.FindAsync(Id); 
         }
+
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -44,12 +42,16 @@ namespace ShowTime.Repositories
 
         public Task UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Update(entity);
+            return Task.CompletedTask;
         }
+
 
         public Task DeleteAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Remove(entity);
+            return Task.CompletedTask;
         }
+
     }
 }

@@ -1,0 +1,84 @@
+﻿@page "/bands"
+@using Blazorise.DataGrid;
+@inject IBandRepository BandRepo;
+
+<h3>Bands</h3>
+
+<style>
+    h1, h2, h3 {
+        font-family: 'Poppins', sans-serif;
+        color: #6c2c0a;
+        font-weight: bold;
+    }
+
+	.btn-primary {
+		color: #fff;
+        background-color: coral; 
+        border: none;
+        padding: 0.6rem 1.3rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(242, 100, 25, 0.3);
+        display: inline-block;
+        text-decoration: none;
+        user-select: none;
+    }
+
+        .btn-primary:hover {
+            background-color: brown;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(211, 84, 0, 0.5);
+        }
+
+      
+</style>
+
+<div class="mb-3">
+	<NavLink class="btn btn-primary" href="bands/create" Match="NavLinkMatch.All">Add New Band</NavLink>
+</div>
+
+<DataGrid Titem="Band"
+	Data= "@_bands"
+	ShowPage= "true"
+	PageSize="10"
+	Responsive="true"
+	Striped="true"
+	Bordered="true"
+	Hoverable="true">
+
+	<DataGridColumns>
+		<DataGridColumn TItem="Band" Field="@nameof(Band.Name)" Caption="Name" ></DataGridColumn>
+		<DataGridColumn TItem="Band" Field="@nameof(Band.Genre)" Caption="Genre" ></DataGridColumn>
+		<DataGridColumn TItem="Band" Caption="Actions" >
+			<DisplayTemplate>
+				<a href="@($"/bands/edit/{context.Id}")" style="color: sienna;">Edit</a>
+                <a href="@($"bands/details/{context.Id}")" style="color: indianred;">Details</a>
+                <a href="@($"bands/delete/{context.Id}")" style="color: darkred;">Delete</a>
+			</DisplayTemplate>
+			</DataGridColumn>
+	</DataGridColumns>
+</DataGrid>
+
+
+@code {
+	
+	private List<Band> _bands;
+	
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			var bands = await BandRepo.GetAllAsync(); // await corect
+			_bands = bands.ToList();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error loading bands: {ex.Message}");
+		}
+	}
+
+}

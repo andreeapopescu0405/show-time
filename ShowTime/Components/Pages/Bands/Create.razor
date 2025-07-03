@@ -1,0 +1,51 @@
+﻿@page "/bands/create"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager;
+@inject IBandRepository BandRepo;
+
+<style>
+	h1, h2, h3 {
+		font-family: 'Poppins', sans-serif;
+		color: #6c2c0a;
+		font-weight: bold;
+	}
+
+</style>
+
+
+<h3>Create</h3>
+
+
+<Fields>
+	<Field>
+		<Label>Name:</Label>
+		<TextEdit @bind-Text="Band.Name" />
+	</Field>
+	<Field>
+		<Label>Genre:</Label>
+		<Select TValue="Genre" @bind-SelectedValue="Band.Genre" >
+			@foreach (Genre genre in Enum.GetValues(typeof(Genre)))
+			{
+				<SelectItem Value="@genre">@genre.ToString()</SelectItem>
+			}
+		</Select>
+	</Field>
+</Fields>
+
+<Button Color="Color.Secondary" Type="ButtonType.Button" @onclick="HandleSubmit">Save</Button>
+
+<Div>
+	<a href="/bands">Back to list</a>
+</Div>
+
+@code {
+	private Band Band { get; set; } = new();
+	
+
+	private async Task HandleSubmit()
+	{
+		await BandRepo.AddAsync(Band);
+		await BandRepo.SaveChangesAsync();
+		NavigationManager.NavigateTo("/bands");
+	}
+}

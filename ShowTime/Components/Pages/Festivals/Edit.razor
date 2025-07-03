@@ -1,0 +1,81 @@
+﻿@page "/festivals/edit/{id:guid}"
+@inject IFestivalRepository FestivalRepo
+@inject NavigationManager NavigationManager
+
+
+<style>
+    h1, h2, h3 {
+        font-family: 'Poppins', sans-serif;
+        color: #6c2c0a;
+        font-weight: bold;
+    }
+
+</style>
+
+
+<h3>Edit Festival</h3>
+
+@if (Festival == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="Festival" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+
+        <div class="mb-3">
+            <label>Name</label>
+            <InputText class="form-control" @bind-Value="Festival.Name" />
+        </div>
+
+        <div class="mb-3">
+            <label>Location</label>
+            <InputText class="form-control" @bind-Value="Festival.Location" />
+        </div>
+
+        <div class="mb-3">
+            <label>Start Date</label>
+            <InputDate class="form-control" @bind-Value="Festival.DataStart" />
+        </div>
+
+        <div class="mb-3">
+            <label>End Date</label>
+            <InputDate class="form-control" @bind-Value="Festival.DataEnd" />
+        </div>
+
+        <Button Type="ButtonType.Submit" Color="Color.Secondary">Save</Button>
+        @* <Button Type="ButtonType.Button" Clicked="Cancel" Color="Color.Dark" Outline>Cancel</Button> *@
+    </EditForm>
+    <Div>
+        <a href="/festivals">Back to list</a>
+    </Div>
+}
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private Festival? Festival;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Festival = await FestivalRepo.GetByIdAsync(id);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Festival != null)
+        {
+            await FestivalRepo.UpdateAsync(Festival);
+            await FestivalRepo.SaveChangesAsync();
+            NavigationManager.NavigateTo("/festivals");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/festivals");
+    }
+}

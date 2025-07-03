@@ -8,6 +8,5 @@ namespace ShowTime.Repositories
     {
         public FestivalRepository(ShowTimeContext context) : base(context) { }
     }
-    {
-    }
+    
 }

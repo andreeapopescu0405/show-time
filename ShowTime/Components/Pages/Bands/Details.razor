@@ -1,0 +1,78 @@
+﻿@page "/bands/details/{id:guid}"
+@inject IBandRepository BandRepo
+@inject NavigationManager NavigationManager
+
+<style>
+    .details-card {
+        width: 500px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+    }
+
+    .details-header {
+        background-color: burlywood;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .details-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .details-footer {
+        padding: 1rem 1.5rem;
+        background-color: #f9f9f9;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        text-align: right;
+    }
+
+    .details-label {
+        font-weight: bold;
+        color: #6c2c0a;
+    }
+
+    .details-value {
+        color: #444;
+    }
+</style>
+
+<div class="d-flex justify-content-center mt-5">
+    @if (Band == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="details-card bg-white">
+            <div class="details-header">
+                <h4 class="mb-0">@Band.Name</h4>
+            </div>
+            <div class="details-body">
+                <p><span class="details-label">Genre:</span> <span class="details-value">@Band.Genre</span></p>
+            </div>
+            <div class="details-footer">
+                <Button Color="Color.Secondary" Clicked="GoBack">Back to List</Button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private Band? Band;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Band = await BandRepo.GetByIdAsync(id);
+        if (Band == null)
+            NavigationManager.NavigateTo("/bands");
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/bands");
+}

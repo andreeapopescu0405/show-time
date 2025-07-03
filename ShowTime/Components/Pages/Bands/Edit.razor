@@ -1,0 +1,74 @@
+﻿@page "/bands/edit/{id:guid}"
+@rendermode InteractiveServer
+@inject IBandRepository BandRepo
+@inject NavigationManager NavigationManager
+
+
+<style>
+	h1, h2, h3 {
+		font-family: 'Poppins', sans-serif;
+		color: #6c2c0a;
+		font-weight: bold;
+	}
+
+</style>
+
+
+<h3>Edit Band</h3>
+
+@if (Band == null)
+{
+	<p>Loading...</p>
+}
+else
+{
+	<Fields>
+		<Field>
+			<Label>Name:</Label>
+			<TextEdit @bind-Text="Band.Name" />
+		</Field>
+		<Field>
+			<Label>Genre:</Label>
+			<Select TValue="Genre" @bind-SelectedValue="Band.Genre">
+				@foreach (Genre genre in Enum.GetValues(typeof(Genre)))
+				{
+					<SelectItem Value="@genre">@genre.ToString()</SelectItem>
+				}
+			</Select>
+		</Field>
+	</Fields>
+
+	<Button Color="Color.Secondary" Type="ButtonType.Button" @onclick="HandleSubmit">Save</Button>
+
+	<Div class="mt-3">
+		<a href="/bands">Back to list</a>
+	</Div>
+}
+
+@code {
+	[Parameter]
+	public Guid id { get; set; }
+
+	private Band? Band;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Band = await BandRepo.GetByIdAsync(id);
+
+		if (Band == null)
+		{
+			Console.WriteLine($"Band with id {id} not found.");
+			NavigationManager.NavigateTo("/bands");
+		}
+	}
+
+	private async Task HandleSubmit()
+	{
+		if (Band != null)
+		{
+			await BandRepo.UpdateAsync(Band);
+			await BandRepo.SaveChangesAsync();
+			NavigationManager.NavigateTo("/bands");
+		}
+	}
+}

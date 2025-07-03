@@ -1,0 +1,82 @@
+﻿@page "/festivals/create"
+@inject NavigationManager NavigationManager
+@inject IFestivalRepository FestivalRepo
+
+<style>
+	h1, h2, h3 {
+		font-family: 'Poppins', sans-serif;
+		color: #6c2c0a;
+		font-weight: bold;
+	}
+</style>
+
+<h3>Create Festival</h3>
+
+<Fields>
+	<Field>
+		<Label>Name:</Label>
+		<TextEdit @bind-Text="Festival.Name" />
+	</Field>
+	<Field>
+		<Label>Location:</Label>
+		<TextEdit @bind-Text="Festival.Location" />
+	</Field>
+	<Field>
+		<Label>Start Date:</Label>
+		<Addons>
+			<Addon AddonType="AddonType.Body">
+				<DatePicker @ref="@dateStart" TValue="DateTime?" @bind-Date="@datestart" />
+			</Addon>
+			<Addon AddonType="AddonType.End">
+				<Button Color="Color.Light" Clicked="@(()=>dateStart.ToggleAsync())">
+					<Icon Name="IconName.CalendarDay" />
+				</Button>
+			</Addon>
+		</Addons>
+
+	</Field>
+	<Field>
+		<Label>End Date:</Label>
+		<Addons>
+			<Addon AddonType="AddonType.Body">
+				<DatePicker @ref="@dateEnd" TValue="DateTime?" @bind-Date="@dateend" />
+			</Addon>
+			<Addon AddonType="AddonType.End">
+				<Button Color="Color.Light" Clicked="@(()=>dateEnd.ToggleAsync())">
+					<Icon Name="IconName.CalendarDay" />
+				</Button>
+			</Addon>
+		</Addons>
+	</Field>
+</Fields>
+
+<Button Color="Color.Secondary" Type="ButtonType.Button" @onclick="HandleSubmit">Save</Button>
+
+<Div>
+	<a href="/festivals">Back to list</a>
+</Div>
+
+@code {
+	private Festival Festival { get; set; } = new();
+
+	DatePicker<DateTime?> dateStart;
+	DatePicker<DateTime?> dateEnd;
+	DateTime? datestart;
+	DateTime? dateend;
+
+
+	private async Task HandleSubmit()
+	{
+		if (datestart.HasValue && dateend.HasValue)
+		{
+			Festival.DataStart = datestart.Value;
+			Festival.DataEnd = dateend.Value;
+
+			await FestivalRepo.AddAsync(Festival);
+			await FestivalRepo.SaveChangesAsync();
+			NavigationManager.NavigateTo("/festivals");
+		}
+		
+	}
+
+}
