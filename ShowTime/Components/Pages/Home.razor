@@ -1,100 +1,116 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@inject IFestivalRepository FestivalRepo
+
+@inject NavigationManager NavigationManager
 
 @using Blazorise
 
-<PageTitle>Home</PageTitle>
-<h1>Choose your ticket! Live your life!</h1>
 <style>
-    .hero-carousel {
+    .festival-card {
         position: relative;
-    }
-
-    .carousel-slide-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8));
+        height: 250px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        text-align: center;
-        padding: 2rem;
-        z-index: 2;
+        justify-content: flex-end;
     }
 
-        .carousel-slide-overlay h2 {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
+    .festival-overlay {
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 1rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+        .festival-overlay h4,
+        .festival-overlay p {
+            text-shadow: 1px 1px 4px black;
+            margin: 0;
         }
 
-        .carousel-slide-overlay p {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
+    .festival-btn {
+        align-self: flex-start;
+        background-color: rgba(255, 255, 255, 0.85);
+        color: black;
+        font-weight: 600;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .festival-btn:hover {
+            background-color: white;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
         }
 </style>
 
-<div class="hero-carousel">
-    <Carousel @bind-SelectedSlide="@selectedSlide" ShowIndicators AutoCycle Interval="5000">
-        <CarouselSlide Name="1">
-            <Image Source="https://www.gds.ro/wp-content/uploads/2024/02/intencity-1-jpg.webp" Display="Display.Block" Width="Width.Is100" />
-            <div class="carousel-slide-overlay">
-                <h2>Intencity Craiova</h2>
-                <p>Music, light, and pure energy. Don’t miss the 2025 edition!</p>
-                <Button Color="Color.Danger" Size="Size.Large" Clicked="@GoToBands">View bands</Button>
-            </div>
-        </CarouselSlide>
-
-        <CarouselSlide Name="2">
-            <Image Source="https://www.olgutavasilescu.ro/wp-content/uploads/2022/09/Intencity-Craiova-2022-Day-one-07.jpg" Display="Display.Block" Width="Width.Is100" />
-        </CarouselSlide>
-    </Carousel>
 
 
-    <Carousel @bind-SelectedSlide="@selectedSlide" ShowIndicators AutoCycle Interval="5000">
-    <CarouselSlide Name="1">
-        <Image Source="https://funkytravel.ro/wp-content/uploads/2021/08/untold-.jpg" Display="Display.Block" Width="Width.Is100" />
-        <div class="carousel-slide-overlay">
-            <h2>Untold Festival</h2>
-                <p>Cluj vibrates every summer. Be there!</p>
-                <Button Color="Color.Warning" Size="Size.Large" Clicked="@GoToBands">View bands</Button>
+<PageTitle>Home</PageTitle>
+
+<h1 class="text-center mt-5 mb-4">Choose your ticket! Live your life!</h1>
+
+@if (Festivals == null)
+{
+    <p class="text-center">Loading festivals...</p>
+}
+else if (!Festivals.Any())
+{
+    <p class="text-center">No festivals available.</p>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            @foreach (var festival in Festivals)
+            {
+                <div class="col-12 col-sm-10 col-md-6 col-lg-4 mb-4 d-flex">
+                    <div class="festival-card w-100"
+                         style="background-image: url('@festival.ImageUrl');">
+                        <div class="festival-overlay">
+                            <div>
+                                <h4>@festival.Name</h4>
+                                <p>@festival.Location</p>
+                                <p>@festival.DataStart.ToString("dd MMM yyyy") – @festival.DataEnd.ToString("dd MMM yyyy")</p>
+                            </div>
+                            <button class="festival-btn" @onclick="() => GoToFestival(festival.Id)">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-    </CarouselSlide>
+    </div>
 
-    <CarouselSlide Name="2">
-        <Image Source="https://cdn.oradesibiu.ro/wp-content/uploads/2021/09/UNTOLD2021_3.jpg" Display="Display.Block" Width="Width.Is100" />
-    </CarouselSlide>
-    </Carousel>
 
-    <Carousel @bind-SelectedSlide="@selectedSlide" ShowIndicators AutoCycle Interval="5000">
-    <CarouselSlide Name="1">
-        <Image Source="https://cms.thatfestivalsite.com/uploads/Beach_Please_2025_2f2590905b.jpg" Display="Display.Block" Width="Width.Is100" />
-        <div class="carousel-slide-overlay">
-            <h2>Beach Please</h2>
-                <p>The sea, the music, and the summer vibe. Secure your ticket!</p>
-                <Button Color="Color.Info" Size="Size.Large" Clicked="@GoToBands">View bands</Button>
-        </div>
-    </CarouselSlide>
-        <CarouselSlide Name="2">
-            <Image Source="https://www.fstvl.io/uploads/media/featured/0001/07/thumb_6362_featured_desktop.jpgs" Display="Display.Block" Width="Width.Is100" />
-        </CarouselSlide>
-    </Carousel>
+}
 
-</div>
 
 @code {
-    private string selectedSlide = "1";
+   
+        private List<Festival> Festivals = new();
 
-    [Inject] NavigationManager NavigationManager { get; set; }
+       
 
-    private void GoToBands()
-    {
-        NavigationManager.NavigateTo("/bands");
-    }
+        protected override async Task OnInitializedAsync()
+        {
+            Festivals = (await FestivalRepo.GetAllAsync()).ToList();
+        }
+
+        private void GoToFestival(Guid id)
+        {
+            NavigationManager.NavigateTo($"/festivals/details/{id}");
+        }
+    
+
+
     
 }

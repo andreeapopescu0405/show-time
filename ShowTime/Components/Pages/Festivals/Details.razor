@@ -1,8 +1,15 @@
 ﻿@page "/festivals/details/{id:guid}"
 @inject IFestivalRepository FestivalRepo
 @inject NavigationManager NavigationManager
+@inject IBandRepository BandRepo;
+
 
 <style>
+    h1, h2, h3 {
+        font-family: 'Poppins', sans-serif;
+        color: #6c2c0a;
+        font-weight: bold;
+    }
     .festival-card {
         width: 600px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -39,42 +46,173 @@
         color: #333;
     }
 </style>
+<h3 class="mb-4">Festival Details</h3>
 
-<div class="d-flex justify-content-center mt-5">
-    @if (Festival == null)
+@if (Festival == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="d-flex justify-content-center mt-5">
+        @if (Festival == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="festival-card bg-white">
+                <div class="festival-header">
+                    <h4 class="mb-0">@Festival.Name</h4>
+                </div>
+                <div class="festival-body">
+                    <p><span class="festival-label">Location:</span> <span class="festival-value">@Festival.Location</span></p>
+                    <p><span class="festival-label">Start Date:</span> <span class="festival-value">@Festival.DataStart.ToString("dd MMM yyyy")</span></p>
+                    <p><span class="festival-label">End Date:</span> <span class="festival-value">@Festival.DataEnd.ToString("dd MMM yyyy")</span></p>
+                </div>
+                <div class="festival-footer">
+                    <Button Color="Color.Secondary" Clicked="GoBack">Back to List</Button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h3 class="mt-5 mb-3 text-center">Line-up</h3>
+
+
+    <DropContainer TItem="BandItem"
+                   Items="@BandItems"
+                   ItemDropped="OnItemDropped"
+                   ItemsFilter="@( (item, dz) => item.Zone == dz )"
+                   Flex="Flex.Wrap.Grow.Is1">
+
+        <ChildContent>
+            <DropZone TItem="BandItem"
+                      Name="available"
+                      AllowReorder
+                      Padding="Padding.Is3"
+                      Margin="Margin.Is3"
+                      Flex="Flex.Grow.Is1">
+                <Heading Size="HeadingSize.Is5">Available Artists</Heading>
+            </DropZone>
+
+            <DropZone TItem="BandItem"
+                      Name="lineup"
+                      AllowReorder
+                      Reordered="OnReordered"
+                      Padding="Padding.Is3"
+                      Margin="Margin.Is3"
+                      Flex="Flex.Grow.Is1">
+                <Heading Size="HeadingSize.Is5">Line-up</Heading>
+            </DropZone>
+        </ChildContent>
+
+        <ItemTemplate>
+            <Card Shadow="Shadow.Default" Margin="Margin.Is2.OnY">
+                <CardBody>
+                    <strong>@context.Band.Name</strong><br />
+                    <small>@context.Band.Genre</small>
+                </CardBody>
+            </Card>
+        </ItemTemplate>
+    </DropContainer>
+
+
+    <div class="d-flex justify-content-end mt-4">
+        <Button Color="Color.Secondary" Clicked="SaveLineup">Save lineup</Button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Status))
     {
-        <p>Loading...</p>
+        <p class="text-success mt-3">@Status</p>
     }
-    else
-    {
-        <div class="festival-card bg-white">
-            <div class="festival-header">
-                <h4 class="mb-0">@Festival.Name</h4>
-            </div>
-            <div class="festival-body">
-                <p><span class="festival-label">Location:</span> <span class="festival-value">@Festival.Location</span></p>
-                <p><span class="festival-label">Start Date:</span> <span class="festival-value">@Festival.DataStart.ToString("dd MMM yyyy")</span></p>
-                <p><span class="festival-label">End Date:</span> <span class="festival-value">@Festival.DataEnd.ToString("dd MMM yyyy")</span></p>
-            </div>
-            <div class="festival-footer">
-                <Button Color="Color.Secondary" Clicked="GoBack">Back to List</Button>
-            </div>
-        </div>
-    }
-</div>
+}
 
 @code {
-    [Parameter]
-    public Guid id { get; set; }
-
+    [Parameter] public Guid id { get; set; }
+    public class BandItem
+    {
+        public Band Band { get; set; } = null!;
+        public string Zone { get; set; } = "available";
+        public int Order { get; set; } = 0; 
+    }
+    private string Status = "";
+    private List<BandItem> BandItems = new();
     private Festival? Festival;
 
     protected override async Task OnInitializedAsync()
     {
-        Festival = await FestivalRepo.GetByIdAsync(id);
+        Festival = await FestivalRepo.GetFestivalWithLineupAsync(id);
         if (Festival == null)
+        {
             NavigationManager.NavigateTo("/festivals");
+            return;
+        }
+
+        var allBands = await BandRepo.GetAllAsync();
+
+        var associatedBandIds = Festival.FestivalsBands.Select(fb => fb.BandId).ToHashSet();
+
+        // bands already in lineup
+        var lineupItems = Festival.FestivalsBands
+            .OrderBy(fb => fb.Order)
+            .Select(fb => new BandItem
+                {
+                    Band = fb.Band,
+                    Zone = "lineup",
+                    Order = fb.Order
+                });
+
+        // bands not yet in lineup
+        var availableItems = allBands
+            .Where(b => !associatedBandIds.Contains(b.Id))
+            .Select(b => new BandItem
+                {
+                    Band = b,
+                    Zone = "available",
+                    Order = 0
+                });
+
+        BandItems = lineupItems.Concat(availableItems).ToList();
     }
 
-    private void GoBack() => NavigationManager.NavigateTo("/festivals");
+    private Task OnItemDropped(DraggableDroppedEventArgs<BandItem> e)
+    {
+        e.Item.Zone = e.DropZoneName;
+        return Task.CompletedTask;
+    }
+
+    private Task OnReordered(DropZoneOrder<BandItem> order)
+    {
+        int index = 1;
+        foreach (var item in order.OrderedItems.OrderBy(i => i.Order))
+        {
+            item.Item.Order = index++;
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveLineup()
+    {
+        if (Festival == null) return;
+
+        var lineup = BandItems
+            .Where(b => b.Zone == "lineup")
+            .OrderBy(b => b.Order)
+            .Select((b, i) => new FestivalBand
+                {
+                    FestivalId = Festival.Id,
+                    BandId = b.Band.Id,
+                    Order = i + 1
+                });
+
+        await FestivalRepo.SaveLineupAsync(Festival.Id, lineup);
+        Status = "Line-up saved!";
+    }
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/festivals");
+    }
+
+
 }

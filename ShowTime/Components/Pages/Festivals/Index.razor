@@ -33,6 +33,14 @@
             box-shadow: 0 6px 16px rgba(211, 84, 0, 0.5);
         }
 
+    .pagination .page-link {
+        color: coral !important;
+    }
+
+        .pagination .page-link:hover {
+            color: brown !important;
+        }
+
 </style>
 
 <div class="mb-3">
@@ -41,8 +49,8 @@
 
 <DataGrid Titem="Festival"
           Data="@_festivals"
-          ShowPage="true"
-          PageSize="10"
+          ShowPager="true"
+          PageSize="5"
           Responsive="true"
           Striped="true"
           Bordered="true"
@@ -51,10 +59,18 @@
     <DataGridColumns>
         <DataGridColumn TItem="Festival" Field="@nameof(Festival.Name)" Caption="Name"></DataGridColumn>
         <DataGridColumn TItem="Festival" Field="@nameof(Festival.Location)" Caption="Location"></DataGridColumn>
-        <DataGridDateColumn Field="@nameof(Festival.DataStart)" Caption="Start date" Editable NativeInputMode />
-        
-        <DataGridDateColumn Field="@nameof(Festival.DataEnd)" Caption="End date" Editable NativeInputMode />
-        
+        <DataGridColumn TItem="Festival" Caption="Start Date">
+            <DisplayTemplate>
+                @context.DataStart.ToString("dd.MM.yyyy")
+            </DisplayTemplate>
+        </DataGridColumn>
+
+        <DataGridColumn TItem="Festival" Caption="End Date">
+            <DisplayTemplate>
+                @context.DataEnd.ToString("dd.MM.yyyy")
+            </DisplayTemplate>
+        </DataGridColumn>
+
         <DataGridColumn TItem="Festival" Caption="Actions">
             <DisplayTemplate>
                 <a href="@($"festivals/edit/{context.Id}")" style="color: sienna;">Edit</a>

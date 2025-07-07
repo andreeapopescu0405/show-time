@@ -2,7 +2,7 @@
 @using Blazorise.DataGrid;
 @inject IBandRepository BandRepo;
 
-<h3>Bands</h3>
+<h3>Artist</h3>
 
 <style>
     h1, h2, h3 {
@@ -33,17 +33,24 @@
             box-shadow: 0 6px 16px rgba(211, 84, 0, 0.5);
         }
 
-      
+	.pagination .page-link {
+		color: coral !important;
+	}
+
+		.pagination .page-link:hover {
+			color: brown !important;
+		}
+
 </style>
 
 <div class="mb-3">
-	<NavLink class="btn btn-primary" href="bands/create" Match="NavLinkMatch.All">Add New Band</NavLink>
+	<NavLink class="btn btn-primary" href="bands/create" Match="NavLinkMatch.All">Add New Artist</NavLink>
 </div>
 
 <DataGrid Titem="Band"
 	Data= "@_bands"
-	ShowPage= "true"
-	PageSize="10"
+	ShowPager= "true"
+	PageSize="5"
 	Responsive="true"
 	Striped="true"
 	Bordered="true"
@@ -60,6 +67,7 @@
 			</DisplayTemplate>
 			</DataGridColumn>
 	</DataGridColumns>
+
 </DataGrid>
 
 
