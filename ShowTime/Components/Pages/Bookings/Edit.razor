@@ -1,0 +1,46 @@
+﻿@page "/bookings/edit/{Id:guid}"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject IBookingRepository BookingRepo
+
+<h3>Edit Booking</h3>
+
+<Fields>
+	<Field>
+		<Label>Date:</Label>
+		<DateEdit @bind-Date="Booking.Date" />
+	</Field>
+	<Field>
+		<Label>Price:</Label>
+		<NumericEdit TValue="float" @bind-Value="Booking.Price" />
+	</Field>
+	<Field>
+		<Label>Email:</Label>
+		<TextEdit @bind-Text="Booking.Email" />
+	</Field>
+</Fields>
+
+<Button Color="Color.Secondary" Type="ButtonType.Button" @onclick="HandleSubmit">Save</Button>
+
+<Div>
+	<a href="/bookings">Back to list</a>
+</Div>
+
+@code {
+	[Parameter] public Guid Id { get; set; }
+	private Booking Booking { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var existing = await BookingRepo.GetByIdAsync(Id);
+		if (existing is not null)
+			Booking = existing;
+	}
+
+	private async Task HandleSubmit()
+	{
+		await BookingRepo.UpdateAsync(Booking);
+		await BookingRepo.SaveChangesAsync();
+		NavigationManager.NavigateTo("/bookings");
+	}
+}

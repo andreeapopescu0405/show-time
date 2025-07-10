@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShowTime.Context;
 
@@ -11,9 +12,11 @@ using ShowTime.Context;
 namespace ShowTime.Migrations
 {
     [DbContext(typeof(ShowTimeContext))]
-    partial class ShowTimeContextModelSnapshot : ModelSnapshot
+    [Migration("20250707074950_AddUser")]
+    partial class AddUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,9 +246,6 @@ namespace ShowTime.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ApplicationUserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -259,16 +259,9 @@ namespace ShowTime.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
-
                     b.HasIndex("FestivalId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
                 });
@@ -372,25 +365,13 @@ namespace ShowTime.Migrations
 
             modelBuilder.Entity("ShowTime.Models.Booking", b =>
                 {
-                    b.HasOne("ShowTime.Models.ApplicationUser", null)
-                        .WithMany("Bookings")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("ShowTime.Models.Festival", "Festival")
                         .WithMany("Bookings")
                         .HasForeignKey("FestivalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShowTime.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Festival");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ShowTime.Models.FestivalBand", b =>
@@ -410,11 +391,6 @@ namespace ShowTime.Migrations
                     b.Navigation("Band");
 
                     b.Navigation("Festival");
-                });
-
-            modelBuilder.Entity("ShowTime.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("ShowTime.Models.Band", b =>

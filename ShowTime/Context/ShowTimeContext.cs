@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using ShowTime.Models;
 
 
 namespace ShowTime.Context
 {
-    public class ShowTimeContext : DbContext
+    public class ShowTimeContext : IdentityDbContext<ApplicationUser , IdentityRole<Guid>, Guid>
     {
         public ShowTimeContext(DbContextOptions<ShowTimeContext> options) : base(options) { }
 
@@ -13,7 +15,7 @@ namespace ShowTime.Context
         public DbSet<Festival> Festivals { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<FestivalBand> FestivalsBands { get; set; }
-        // public DbSet<User> Users { get; set; }
+       
     
 
    protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +32,14 @@ namespace ShowTime.Context
                 .HasOne(sc => sc.Band)
                 .WithMany(c => c.FestivalsBands)
                 .HasForeignKey(sc => sc.BandId);
+
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Booking>()
+       .HasOne(b => b.User)
+       .WithMany() 
+       .HasForeignKey(b => b.UserId)
+       .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

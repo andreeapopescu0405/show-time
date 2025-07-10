@@ -1,0 +1,73 @@
+﻿@page "/bookings/create"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using ShowTime.Models
+@inject NavigationManager NavigationManager
+@inject IBookingRepository BookingRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IFestivalRepository FestivalRepo
+
+<style>
+	h1, h2, h3 {
+		font-family: 'Poppins', sans-serif;
+		color: #6c2c0a;
+		font-weight: bold;
+	}
+
+</style>
+
+<h3>Create Booking</h3>
+
+<Fields>
+	<Field>
+		<Label>Date:</Label>
+		<DateEdit @bind-Date="Booking.Date" />
+	</Field>
+	<Field>
+		<Label>Price:</Label>
+		<NumericEdit TValue="float" @bind-Value="Booking.Price" />
+	</Field>
+	@* <Field> *@
+	@* 	<Label>Email:</Label> *@
+	@* 	<TextEdit @bind-Text="Booking.Email" /> *@
+	@* </Field> *@
+	<Field>
+		<Label>Festival:</Label>
+		<Select TValue="Guid" @bind-SelectedValue="Booking.FestivalId">
+			@if (Festivals is not null)
+			{
+				@foreach (var festival in Festivals)
+				{
+					<SelectItem Value="@festival.Id">@festival.Name</SelectItem>
+				}
+			}
+		</Select>
+	</Field>
+
+</Fields>
+
+<Button Color="Color.Secondary" Type="ButtonType.Button" @onclick="HandleSubmit">Save</Button>
+
+<Div>
+	<a href="/bookings">Back to list</a>
+</Div>
+
+@code {
+	@code {
+		private Booking Booking { get; set; } = new();
+		private List<Festival> Festivals = new();
+
+		protected override async Task OnInitializedAsync()
+		{
+			Festivals = (await FestivalRepo.GetAllAsync()).ToList();
+		}
+
+		private async Task HandleSubmit()
+		{
+			await BookingRepo.AddAsync(Booking);
+			await BookingRepo.SaveChangesAsync();
+			NavigationManager.NavigateTo("/bookings");
+		}
+	}
+
+}

@@ -1,0 +1,47 @@
+﻿@page "/bookings/details/{Id:guid}"
+@rendermode InteractiveServer
+
+@using ShowTime.Models
+@inject IBookingRepository BookingRepo
+
+<h3>Booking Details</h3>
+
+@if (Booking is null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<Fields>
+		<Field>
+			<Label>Date:</Label>
+			<Span>@Booking.Date.ToShortDateString()</Span>
+		</Field>
+		<Field>
+			<Label>Price:</Label>
+			<Span>@Booking.Price</Span>
+		</Field>
+		<Field>
+			<Label>Email:</Label>
+			<Span>@Booking.Email</Span>
+		</Field>
+		<Field>
+			<Label>Festival:</Label>
+			<Span>@(Booking.Festival?.Name ?? "Unknown")</Span>
+		</Field>
+	</Fields>
+}
+
+<Div>
+	<a href="/bookings">Back to list</a>
+</Div>
+
+@code {
+	[Parameter] public Guid Id { get; set; }
+	private Booking? Booking;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Booking = await BookingRepo.GetByIdWithFestivalAsync(Id);
+	}
+}

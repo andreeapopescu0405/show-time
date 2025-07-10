@@ -1,0 +1,108 @@
+﻿@page "/bookings"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using ShowTime.Models
+@inject IBookingRepository BookingRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<style>
+    h1, h2, h3 {
+        font-family: 'Poppins', sans-serif;
+        color: #6c2c0a;
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: coral;
+        border: none;
+        padding: 0.6rem 1.3rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(242, 100, 25, 0.3);
+        display: inline-block;
+        text-decoration: none;
+        user-select: none;
+    }
+
+        .btn-primary:hover {
+            background-color: brown;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(211, 84, 0, 0.5);
+        }
+
+    .pagination .page-link {
+        color: coral !important;
+    }
+
+        .pagination .page-link:hover {
+            color: brown !important;
+        }
+
+</style>
+
+
+<h3>Your Bookings</h3>
+
+@if (bookings is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!bookings.Any())
+{
+    <p><em>No bookings found.</em></p>
+}
+else
+{
+    <Table>
+        <TableHeader>
+            <TableRow>
+                <TableHeaderCell>Date</TableHeaderCell>
+                <TableHeaderCell>Price</TableHeaderCell>
+                <TableHeaderCell>Email</TableHeaderCell>
+                <TableHeaderCell>Actions</TableHeaderCell>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var booking in bookings)
+            {
+                <TableRow>
+                    <TableCell>@booking.Date.ToShortDateString()</TableCell>
+                    <TableCell>@booking.Price</TableCell>
+                    <TableCell>@booking.Email</TableCell>
+                    <TableCell>
+                        <a href=$"/bookings/details/{booking.Id}">Details</a> |
+                        <a href=$"/bookings/edit/{booking.Id}">Edit</a>
+                    </TableCell>
+                </TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+
+<div class="mb-3">
+    <NavLink class="btn btn-primary" href="bookings/create" Match="NavLinkMatch.All">Add New Booking</NavLink>
+</div>
+
+@code {
+    private List<Booking>? bookings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        var userId = user.FindFirst(c =>
+            c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value;
+
+        if (userId != null)
+        {
+            var result = await BookingRepo.GetAllByUserIdAsync(userId);
+            bookings = result.ToList();
+        }
+    }
+}
